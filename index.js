@@ -11,24 +11,12 @@ app.use(bodyParser.json());
 
 // CORS configuration for production
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    const allowedOrigins = process.env.NODE_ENV === 'production' 
-      ? [
-          process.env.FRONTEND_URL,
-          'https://auth-app-frontend-sage.vercel.app/',
-          'https://auth-app-frontend-sage.vercel.app/'
-        ]
-      : ['http://localhost:3000'];
-    
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: process.env.NODE_ENV === 'production' 
+    ? [
+        process.env.FRONTEND_URL,
+        'https://auth-app-frontend-sage.vercel.app'
+      ]
+    : ['http://localhost:3000'],
   credentials: true,
   optionsSuccessStatus: 200
 };

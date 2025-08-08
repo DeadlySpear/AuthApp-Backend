@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 // CORS configuration for production
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL, 'https://your-frontend-domain.vercel.app'] // Replace with your actual Vercel domain
+    ? [process.env.FRONTEND_URL, 'https://auth-app-frontend-sage.vercel.app/'] // Replace with your actual Vercel domain
     : ['http://localhost:3000'],
   credentials: true,
   optionsSuccessStatus: 200

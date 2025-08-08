@@ -11,9 +11,24 @@ app.use(bodyParser.json());
 
 // CORS configuration for production
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL, 'https://auth-app-frontend-sage.vercel.app/'] // Replace with your actual Vercel domain
-    : ['http://localhost:3000'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = process.env.NODE_ENV === 'production' 
+      ? [
+          process.env.FRONTEND_URL,
+          'https://auth-app-frontend-sage.vercel.app/',
+          'https://auth-app-frontend-sage.vercel.app/'
+        ]
+      : ['http://localhost:3000'];
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -33,8 +48,21 @@ app.use('/products', require('./routes/productRouter.js'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
+  console.error('Error:', err.message);
+  console.error('Stack:', err.stack);
+  
+  // Handle CORS errors
+  if (err.message === 'Not allowed by CORS') {
+    return res.status(403).json({ 
+      message: 'CORS error: Origin not allowed',
+      error: process.env.NODE_ENV === 'development' ? err.message : 'Forbidden'
+    });
+  }
+  
+  res.status(500).json({ 
+    message: 'Something went wrong!',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+  });
 });
 
 // 404 handler
